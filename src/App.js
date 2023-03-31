@@ -22,6 +22,14 @@ class App extends React.Component {
     this.setState({items:thisItems});//update state
     console.log("items:",this.state.items);
   }
+  // delete 함수 추가. (alt+shit+f 포맷팅)
+  delete=(item)=>{
+    const thisItems = this.state.items;
+    const newItems = thisItems.filter(e=>e.id !== item.id);
+    this.setState({items:newItems},()=>{
+      console.log("Update Items : ", this.state.items);
+    })
+  }
 
 
   render(){
@@ -32,7 +40,7 @@ class App extends React.Component {
       <Paper style={{margin:16}}>
         <List>
           {this.state.items.map((item,idx)=>(
-            <Todo item={item} key={item.id}/>
+            <Todo item={item} key={item.id} delete ={this.delete}/>
           ))}
         </List>
       </Paper>
