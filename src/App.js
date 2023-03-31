@@ -1,4 +1,3 @@
-import './App.css';
 import Todo from './Todo';
 import React from 'react';
 import {Paper,List} from "@material-ui/core"
