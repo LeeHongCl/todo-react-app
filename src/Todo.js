@@ -34,10 +34,18 @@ class Todo extends React.Component{
         const thisItem =this.state.item;
         thisItem.done = thisItem.done ?false :true;
         this.setState({item:thisItem});
+        this.update(this.state.item);
+        var length = thisItem.title.length -10;
+        if(thisItem.done === true){
+            thisItem.title = thisItem.title + "- Complete";
+        }else if(thisItem.done === false) {
+            thisItem.title = thisItem.title.slice(0,length);
+        }
     }
 
     render(){
         const item = this.state.item;
+        
         return(
             <ListItem>
                 <Checkbox 

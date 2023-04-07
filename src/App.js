@@ -1,14 +1,16 @@
 import Todo from './Todo';
 import React from 'react';
 import AddTodo from './AddTodo';
-import {Paper,List,Container} from "@material-ui/core"
-import {call} from './service/ApiService'
+import DeleteTodo from './DeleteTodo';
+import {Paper,List,Container, AppBar, Toolbar, Grid, Typography, Button} from "@material-ui/core"
+import {call, signout} from './service/ApiService'
 
 class App extends React.Component {
   constructor(props){   //매개변수 props 생성자
     super(props);      //매개변수 props 초기화
     this.state = {    //item 에 item.id, item.title, item.done 매개변수 이름과 값 할당
       items : [],
+      loading : true,
     };
   }
   // add 함수 추가
@@ -30,9 +32,20 @@ class App extends React.Component {
     );
   }
 
+  deleteForCompleted = ()=>{
+    const thisItems = this.state.items;
+    thisItems.map((e)=>{
+      if(e.done === true){
+        call("/todo","DELETE",e).then((response)=>
+          this.setState({items:response.data})
+        );
+      }
+    });
+  }
+
   componentDidMount=()=>{
     call("/todo","GET",null).then((response)=>
-      this.setState({items:response.data})
+      this.setState({items:response.data,loading:false})
     );
   }
 
@@ -44,19 +57,49 @@ class App extends React.Component {
       <Paper style={{margin:16}}>
         <List>
           {this.state.items.map((item,idx)=>(
-            <Todo item={item} key={item.id} delete ={this.delete}/>
+            <Todo item={item} key={item.id} delete ={this.delete} update={this.update} />
           ))}
         </List>
       </Paper>
-    )
+    );
 
+    var navigationBar=(
+      <AppBar position="static">
+        <Toolbar>
+          <Grid justifyContent="space-between" container>
+            <Grid item>
+              <Typography variant='h6'>오늘의 할일</Typography>
+            </Grid>
+            <Grid item>
+              <Button color='inherit' onClick={signout}>logout</Button>
+            </Grid>
+
+          </Grid>
+        </Toolbar>
+      </AppBar>
+    );
+
+    var todoListPage = (
+      <div>
+        {navigationBar}
+        <Container maxWidth="md">
+          <AddTodo add={this.add} />
+          <div className="TodoList">{todoItems}</div>
+        </Container>
+        <DeleteTodo deleteForCompleted={this.deleteForCompleted} />
+      </div>
+    );
+
+    var loadingPage = <h1>로딩중..</h1>
+    var content = loadingPage;
+
+    if(!this.state.loading){
+      content = todoListPage;
+    };
     // add 함수 연결
     return (
       <div className="App">
-          <Container maxWidth="md">
-            <AddTodo add={this.add}/>
-            <div className="TodoList">{todoItems}</div>
-          </Container>
+        {content}
       </div>
     );
   }
